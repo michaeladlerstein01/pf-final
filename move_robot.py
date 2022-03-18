@@ -33,7 +33,7 @@ def plot_manholes(manholes) :
         lines = pygame.draw.line(surface , white , (manholes[i-1][0],manholes[i-1][1]) ,  (manholes[i][0],manholes[i][1]) )                         
     pygame.display.flip() 
  
-starting_point =  manholes[1]
+starting_point =  manholes[0]
 location = starting_point
 n = manholes.index(location)
 
@@ -78,7 +78,7 @@ def sense(location , n ):
 
 length = len(manholes)-1 
 
-number_particles = 10
+number_particles = 100
 
 particle_location = location
 particle_angle = []
@@ -125,18 +125,21 @@ def particle_sense(particle_location , n ):
     particle_distance = np.sqrt((manholes[n+1][0] - particle_location[0])**2 + (manholes[n+1][1] - particle_location[1])**2) + np.random.normal(0, 2) 
     return particle_distance 
 
-
-
 weight_particle = []
 def weight(distance , particle_distance):
     weight_particle  = norm.pdf(particle_distance, distance, 2 )
     return weight_particle
 
+
 def resample(weight_particle , particle_location ):
-    resample = r.choices(particle_distance , weight_particle , k = number_particles)
-    particle_location = resample
+    particle_list = list(zip(particle_location[0] , particle_location[1]))  
+    resample = r.choices(particle_list , weight_particle , k = number_particles)
+  #  particle_location = resample
+    particle_location = list(zip(*resample))
     return particle_location
          
+
+
 #def sample()
            
     
@@ -165,10 +168,10 @@ while True :
             
             particle_distance = particle_sense(particle_location , n )
            
-           # weight_particle = weight(distance , particle_distance)
-            print(weight_particle)
-           
-            #particle_location =  resample(weight_particle , particle_location )
+            weight_particle = weight(distance , particle_distance)
+            if any(weight_particle) == True:
+           # print(weight_particle)
+                particle_location =  resample(weight_particle , particle_location )
             #weight_particle = []
             
             
